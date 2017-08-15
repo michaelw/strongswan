@@ -1,0 +1,3 @@
+etc/strongswan.d/charon/tnc-pdp.conf
+usr/lib/ipsec/plugins/libstrongswan-tnc-pdp.so
+usr/share/strongswan/templates/config/plugins/tnc-pdp.conf

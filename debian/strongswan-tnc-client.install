@@ -1,0 +1,6 @@
+etc/strongswan.d/charon/tnc-imc.conf
+usr/lib/ipsec/imcvs/imc-*.so
+usr/lib/ipsec/plugins/libstrongswan-tnc-imc.so
+usr/lib/ipsec/regid.*.strongswan_strongSwan-*.swidtag
+usr/share/regid.*.org.strongswan/regid.*.org.strongswan_strongSwan-*.swidtag
+usr/share/strongswan/templates/config/plugins/tnc-imc.conf

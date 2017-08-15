@@ -1,0 +1,11 @@
+--- a/src/libstrongswan/plugins/bliss/tests/suites/test_bliss_sampler.c
++++ b/src/libstrongswan/plugins/bliss/tests/suites/test_bliss_sampler.c
+@@ -89,7 +89,7 @@
+ 	s = suite_create("bliss_sampler");
+ 
+ 	tc = tcase_create("sampler_gaussian");
+-	tcase_set_timeout(tc, 10);
++	tcase_set_timeout(tc, 30);
+ 	tcase_add_loop_test(tc, test_bliss_sampler_gaussian, 0, countof(key_size));
+ 	suite_add_tcase(s, tc);
+ 

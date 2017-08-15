@@ -1,0 +1,11 @@
+--- a/conf/plugins/kernel-libipsec.conf
++++ b/conf/plugins/kernel-libipsec.conf
+@@ -5,7 +5,7 @@
+ 
+     # Whether to load the plugin. Can also be an integer to increase the
+     # priority of this plugin.
+-    load = yes
++    load = no
+ 
+ }
+ 

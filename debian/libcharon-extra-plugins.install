@@ -1,0 +1,40 @@
+# libcharon plugins
+usr/lib/ipsec/plugins/libstrongswan-addrblock.so
+usr/lib/ipsec/plugins/libstrongswan-certexpire.so
+usr/lib/ipsec/plugins/libstrongswan-eap*.so
+usr/lib/ipsec/plugins/libstrongswan-error-notify.so
+usr/lib/ipsec/plugins/libstrongswan-kernel-libipsec.so
+usr/lib/ipsec/plugins/libstrongswan-led.so
+usr/lib/ipsec/plugins/libstrongswan-lookip.so
+usr/lib/ipsec/plugins/libstrongswan-unity.so
+usr/lib/ipsec/plugins/libstrongswan-xauth-*.so
+# standard configuration files
+usr/share/strongswan/templates/config/plugins/addrblock.conf
+usr/share/strongswan/templates/config/plugins/certexpire.conf
+usr/share/strongswan/templates/config/plugins/eap-*.conf
+usr/share/strongswan/templates/config/plugins/error-notify.conf
+usr/share/strongswan/templates/config/plugins/kernel-libipsec.conf
+usr/share/strongswan/templates/config/plugins/led.conf
+usr/share/strongswan/templates/config/plugins/lookip.conf
+usr/share/strongswan/templates/config/plugins/unity.conf
+usr/share/strongswan/templates/config/plugins/xauth-*.conf
+etc/strongswan.d/charon/addrblock.conf
+etc/strongswan.d/charon/certexpire.conf
+etc/strongswan.d/charon/eap-*.conf
+etc/strongswan.d/charon/error-notify.conf
+etc/strongswan.d/charon/kernel-libipsec.conf
+etc/strongswan.d/charon/led.conf
+etc/strongswan.d/charon/lookip.conf
+etc/strongswan.d/charon/unity.conf
+etc/strongswan.d/charon/xauth-*.conf
+debian/usr.lib.ipsec.lookip /etc/apparmor.d/
+# support libs
+usr/lib/ipsec/libipsec.so*
+usr/lib/ipsec/libpttls.so*
+usr/lib/ipsec/libradius.so*
+usr/lib/ipsec/libsimaka.so*
+usr/lib/ipsec/libtls.so*
+# binaries
+usr/lib/ipsec/error-notify
+usr/lib/ipsec/lookip
+usr/lib/ipsec/pt-tls-client

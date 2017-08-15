@@ -1,0 +1,16 @@
+etc/strongswan.d/charon/tnccs-11.conf
+etc/strongswan.d/charon/tnccs-20.conf
+etc/strongswan.d/charon/tnccs-dynamic.conf
+etc/strongswan.d/charon/tnc-tnccs.conf
+etc/strongswan.d/imcv.conf
+etc/strongswan.d/tnc.conf
+usr/lib/ipsec/libimcv.*
+usr/lib/ipsec/libtnccs.so*
+usr/lib/ipsec/plugins/libstrongswan-tnccs-*.so
+usr/lib/ipsec/plugins/libstrongswan-tnc-tnccs.so
+usr/share/strongswan/templates/config/plugins/tnccs-11.conf
+usr/share/strongswan/templates/config/plugins/tnccs-20.conf
+usr/share/strongswan/templates/config/plugins/tnccs-dynamic.conf
+usr/share/strongswan/templates/config/plugins/tnc-tnccs.conf
+usr/share/strongswan/templates/config/strongswan.d/imcv.conf
+usr/share/strongswan/templates/config/strongswan.d/tnc.conf

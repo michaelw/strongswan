@@ -1,0 +1,13 @@
+etc/strongswan.d/attest.conf
+etc/strongswan.d/charon/tnc-imv.conf
+etc/strongswan.d/pacman.conf
+usr/lib/ipsec/attest
+usr/lib/ipsec/imcvs/imv-*.so
+usr/lib/ipsec/_imv_policy
+usr/lib/ipsec/imv_policy_manager
+usr/lib/ipsec/pacman
+usr/lib/ipsec/plugins/libstrongswan-tnc-imv.so
+usr/share/strongswan/templates/config/plugins/tnc-imv.conf
+usr/share/strongswan/templates/config/strongswan.d/attest.conf
+usr/share/strongswan/templates/config/strongswan.d/pacman.conf
+usr/share/strongswan/templates/database/imv/*.sql

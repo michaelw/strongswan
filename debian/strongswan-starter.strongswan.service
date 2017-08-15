@@ -1,0 +1,16 @@
+[Unit]
+Description=strongSwan IPsec services
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=forking
+Restart=on-failure
+ExecStartPre=/bin/mkdir -p /var/lock/subsys
+Environment="PIDFILE=/var/run/charon.pid"
+ExecStart=/usr/sbin/ipsec start
+ExecStop=/usr/sbin/ipsec stop
+ExecStopPost=/bin/rm -f /var/run/charon.pid /var/run/starter.charon.pid
+
+[Install]
+WantedBy=multi-user.target

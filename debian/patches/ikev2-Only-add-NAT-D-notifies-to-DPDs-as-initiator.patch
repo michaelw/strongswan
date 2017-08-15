@@ -1,0 +1,56 @@
+Description: ikev2: Only add NAT-D notifies to DPDs as initiator
+
+commit 33241871a82a0c374128373e47380be60f0431fa
+Author: Tobias Brunner <tobias@strongswan.org>
+Date:   Fri Sep 30 10:24:54 2016 +0200
+
+    ikev2: Only add NAT-D notifies to DPDs as initiator
+
+    If a responder is natted it will usually be a static NAT (unless it's a
+    mediated connection) in which case adding these notifies makes not much
+    sense (if the initiator's NAT mapping had changed the responder wouldn't
+    be able to reach it anyway).  It's also problematic as some clients refuse
+    to respond to DPDs if they contain such notifies.
+
+    Fixes #2126.
+
+Forwarded: n/a, backport from upstream
+Author: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+Original-Author: Tobias Brunner <tobias@strongswan.org>
+Origin: upstream, https://wiki.strongswan.org/projects/strongswan/repository/revisions/33241871a82a0c374128373e47380be60f0431fa/diff
+Bug-Ubuntu: https://bugs.launchpad.net/bugs/1687711
+Patch-Name: debian/patches/ikev2-Only-add-NAT-D-notifies-to-DPDs-as-initiator.patch
+Last-Update: 2017-05-3
+--- a/src/libcharon/sa/ikev2/task_manager_v2.c
++++ b/src/libcharon/sa/ikev2/task_manager_v2.c
+@@ -1671,15 +1671,22 @@
+ 	if (this->ike_sa->supports_extension(this->ike_sa, EXT_MOBIKE) &&
+ 		this->ike_sa->has_condition(this->ike_sa, COND_NAT_HERE))
+ 	{
+-		/* use mobike enabled DPD to detect NAT mapping changes */
+-		mobike = ike_mobike_create(this->ike_sa, TRUE);
+-		mobike->dpd(mobike);
+-		queue_task(this, &mobike->task);
+-	}
+-	else
+-	{
+-		queue_task(this, (task_t*)ike_dpd_create(TRUE));
++#ifdef ME
++		peer_cfg_t *cfg = this->ike_sa->get_peer_cfg(this->ike_sa);
++		if (cfg->get_peer_id(cfg) ||
++			this->ike_sa->has_condition(this->ike_sa, COND_ORIGINAL_INITIATOR))
++#else
++		if (this->ike_sa->has_condition(this->ike_sa, COND_ORIGINAL_INITIATOR))
++#endif
++		{
++			/* use mobike enabled DPD to detect NAT mapping changes */
++			mobike = ike_mobike_create(this->ike_sa, TRUE);
++			mobike->dpd(mobike);
++			queue_task(this, &mobike->task);
++			return;
++		}
+ 	}
++	queue_task(this, (task_t*)ike_dpd_create(TRUE));
+ }
+ 
+ METHOD(task_manager_t, adopt_tasks, void,

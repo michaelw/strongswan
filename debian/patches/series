@@ -1,0 +1,9 @@
+01_fix-manpages.patch
+03_systemd-service.patch
+04_disable-libtls-tests.patch
+dont-load-kernel-libipsec-plugin-by-default.patch
+increase-bliss-test-timeout.patch
+ikev2-Only-add-NAT-D-notifies-to-DPDs-as-initiator.patch
+CVE-2017-9022.patch
+CVE-2017-9023.patch
+CVE-2017-11185.patch

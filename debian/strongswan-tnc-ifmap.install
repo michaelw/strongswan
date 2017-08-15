@@ -1,0 +1,3 @@
+etc/strongswan.d/charon/tnc-ifmap.conf
+usr/lib/ipsec/plugins/libstrongswan-tnc-ifmap.so
+usr/share/strongswan/templates/config/plugins/tnc-ifmap.conf

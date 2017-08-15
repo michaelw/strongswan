@@ -1,0 +1,1844 @@
+strongswan (5.3.5-1ubuntu3.4) xenial-security; urgency=medium
+
+  * SECURITY UPDATE: Fix RSA signature verification
+    - debian/patches/CVE-2017-11185.patch: does some
+      verifications in order to avoid null-point dereference
+      in src/libstrongswan/gmp/gmp_rsa_public_key.c
+    - CVE-2017-11185
+
+ -- Leonidas S. Barbosa <leo.barbosa@canonical.com>  Tue, 15 Aug 2017 15:00:04 -0300
+
+strongswan (5.3.5-1ubuntu3.3) xenial-security; urgency=medium
+
+  * SECURITY UPDATE: Insufficient Input Validation in gmp Plugin
+    - debian/patches/CVE-2017-9022.patch: make sure the modulus is odd and
+      the exponent not zero in
+      src/libstrongswan/plugins/gmp/gmp_rsa_public_key.c.
+    - CVE-2017-9022
+  * SECURITY UPDATE: Incorrect Handling of CHOICE types in ASN.1 parser and
+    x509 plugin
+    - debian/patches/CVE-2017-9023.patch: fix CHOICE parsing in
+      src/libstrongswan/asn1/asn1_parser.*,
+      src/libstrongswan/plugins/x509/x509_cert.c.
+    - CVE-2017-9023
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Wed, 24 May 2017 15:03:14 -0400
+
+strongswan (5.3.5-1ubuntu3.2) xenial; urgency=medium
+
+  * d/p/ikev2-Only-add-NAT-D-notifies-to-DPDs-as-initiator.patch: fix issue
+    related to DPD vs iOS10 (LP: #1687711)
+
+ -- Christian Ehrhardt <christian.ehrhardt@canonical.com>  Wed, 03 May 2017 17:37:06 +0200
+
+strongswan (5.3.5-1ubuntu3.1) xenial; urgency=medium
+
+  * fix strongswan ipsec status issue with apparmor (LP: #1587886)
+
+ -- Christian Ehrhardt <christian.ehrhardt@canonical.com>  Tue, 07 Feb 2017 15:25:47 +0100
+
+strongswan (5.3.5-1ubuntu3) xenial; urgency=medium
+
+  * Rebuild against libmysqlclient20.
+
+ -- Robie Basak <robie.basak@ubuntu.com>  Tue, 05 Apr 2016 13:02:48 +0000
+
+strongswan (5.3.5-1ubuntu2) xenial; urgency=medium
+
+  * debian/tests/plugins: rdrand may or may not be loaded, depending on the
+    cpu features.
+
+ -- Iain Lane <iain@orangesquash.org.uk>  Mon, 22 Feb 2016 17:13:01 +0000
+
+strongswan (5.3.5-1ubuntu1) xenial; urgency=medium
+
+  * debian/{rules,control,libstrongswan-extra-plugins.install}
+    Enable bliss plugin
+  * debian/{rules,control,libstrongswan-extra-plugins.install}
+    Enable chapoly plugin
+  * debian/patches/dont-load-kernel-libipsec-plugin-by-default.patch
+    Upstream suggests to not load this plugin by default as it has
+    some limitations.
+    https://wiki.strongswan.org/projects/strongswan/wiki/Kernel-libipsec
+  * debian/patches/increase-bliss-test-timeout.patch
+    Under QEMU/KVM for autopkgtest bliss test takes a bit longer then default
+  * Update Apparmor profiles
+    - usr.lib.ipsec.charon
+      - add capability audit_write for xauth-pam (LP: #1470277)
+      - add capability dac_override (needed by agent plugin)
+      - allow priv dropping (LP: #1333655)
+      - allow caching CRLs (LP: #1505222)
+      - allow rw access to /dev/net/tun for kernel-libipsec (LP: #1309594)
+    - usr.lib.ipsec.stroke
+      - allow priv dropping (LP: #1333655)
+      - add local include
+    - usr.lib.ipsec.lookip
+      - add local include
+  * Merge from Debian, which includes fixes for all previous CVEs
+    Fixes (LP: #1330504, #1451091, #1448870, #1470277)
+    Remaining changes:
+      * debian/control
+        - Lower dpkg-dev to 1.16.1 from 1.16.2 to enable backporting to Precise
+        - Update Maintainer for Ubuntu
+        - Add build-deps
+          - dh-apparmor
+          - iptables-dev
+          - libjson0-dev
+          - libldns-dev
+          - libmysqlclient-dev
+          - libpcsclite-dev
+          - libsoup2.4-dev
+          - libtspi-dev
+          - libunbound-dev
+        - Drop build-deps
+          - libfcgi-dev
+          - clearsilver-dev
+        - Create virtual packages for all strongswan-plugin-* for dist-upgrade
+        - Set XS-Testsuite: autopkgtest
+      * debian/rules:
+        - Enforcing DEB_BUILD_OPTIONS=nostrip for library integrity checking.
+        - Set TESTS_REDUCED_KEYLENGTHS to one generate smallest key-lengths in
+          tests.
+        - Change init/systemd program name to strongswan
+        - Install AppArmor profiles
+        - Removed pieces on 'patching ipsec.conf' on build.
+        - Enablement of features per Ubuntu current config suggested from
+          upstream recommendation
+        - Unpack and sort enabled features to one-per-line
+        - Disable duplicheck as per
+          https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=718291#10
+        - Disable libfast (--disable-fast):
+          Requires dropping medsrv, medcli plugins which depend on libfast
+        - Add configure options
+          --with-tss=trousers
+        - Remove configure options:
+          --enable-ha (requires special kernel)
+          --enable-unit-test (unit tests run by default)
+        - Drop logcheck install
+      * debian/tests/*
+        - Add DEP8 test for strongswan service and plugins
+      * debian/strongswan-starter.strongswan.service
+        - Add new systemd file instead of patching upstream
+      * debian/strongswan-starter.links
+        - removed, use Ubuntu systemd file instead of linking to upstream
+      * debian/usr.lib.ipsec.{charon, lookip, stroke}
+        - added AppArmor profiles for charon, lookip and stroke
+      * debian/libcharon-extra-plugins.install
+        - Add plugins
+          - kernel-libipsec.{so, lib, conf, apparmor}
+        - Remove plugins
+          - libstrongswan-ha.so
+        - Relocate plugins
+          - libstrongswan-tnc-tnccs.so (strongswan-tnc-base.install)
+      * debian/libstrongswan-extra-plugins.install
+        - Add plugins (so, lib, conf)
+          - acert
+          - attr-sql
+          - coupling
+          - dnscert
+          - fips-prf
+          - gmp
+          - ipseckey
+          - load-tester
+          - mysql
+          - ntru
+          - radattr
+          - soup
+          - sqlite
+          - sql
+          - systime-fix
+          - unbound
+          - whitelist
+        - Relocate plugins (so, lib, conf)
+          - ccm (libstrongswan.install)
+          - test-vectors (libstrongswan.install)
+      * debian/libstrongswan.install
+        - Sort sections
+        - Add plugins (so, lib, conf)
+          - libchecksum
+          - ccm
+          - eap-identity
+          - md4
+          - test-vectors
+      * debian/strongswan-charon.install
+        - Add AppArmor profile for charon
+      * debian/strongswan-starter.install
+        - Add tools, manpages, conf
+          - openac
+          - pool
+          - _updown_espmark
+        - Add AppArmor profile for stroke
+      * debian/strongswan-tnc-base.install
+        - Add new subpackage for TNC
+        - remove non-existent (dropped in 5.2.1) libpts library files
+      * debian/strongswan-tnc-client.install
+        - Add new subpackage for TNC
+      * debian/strongswan-tnc-ifmap.install
+        - Add new subpackage for TNC
+      * debian/strongswan-tnc-pdp.install
+        - Add new subpackage for TNC
+      * debian/strongswan-tnc-server.install
+        - Add new subpackage for TNC
+      * debian/strongswan-starter.postinit:
+        - Removed section about runlevel changes, it's almost 2014.
+        - Adapted service restart section for Upstart.
+        - Remove old symlinks to init.d files is necessary.
+      * debian/strongswan-starter.dirs: Don't touch /etc/init.d.
+      * debian/strongswan-starter.postrm: Removed 'update-rc.d ipsec remove' call.
+      * debian/strongswan-starter.prerm: Stop strongswan service on package
+        removal (as opposed to using the old init.d script).
+      * debian/libstrongswan.strongswan.logcheck combined into debian/strongswan.logcheck
+        - logcheck patterns updated to be helpful
+      * debian/strongswan-starter.postinst: Removed further out-dated code and
+        entire section on opportunistic encryption - this was never in strongSwan.
+      * debian/ipsec.secrets.proto: Removed ipsec.secrets.inc reference.
+    Drop changes:
+      * debian/control
+        - Per-plugin package breakup: Reducing packaging delta from Debian 
+        - Don't build dhcp, farp subpackages: Reduce packging delta from Debian
+      * debian/watch: Already exists in Debian merge
+      * debian/upstream/signing-key.asc:  Upstream has newer version.
+
+ -- Ryan Harper <ryan.harper@canonical.com>  Fri, 12 Feb 2016 11:24:53 -0600
+
+strongswan (5.3.5-1) unstable; urgency=medium
+
+  * New upstream bugfix release.
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Thu, 26 Nov 2015 15:27:01 +0100
+
+strongswan (5.3.4-1) unstable; urgency=medium
+
+  * New upstream release.
+  * debian/patches:
+    - 03_systemd-service refreshed for new upstream release.
+    - 0001-socket-default-Refactor-setting-source-address-when-,
+    0001-socket-dynamic-Refactor-setting-source-address-when- and
+    CVE-2015-8023_eap_mschapv2_state dropped, included upstream. 
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Thu, 19 Nov 2015 22:17:43 +0100
+
+strongswan (5.3.3-3) unstable; urgency=high
+
+  * Set urgency=high for security fix.
+  * debian/patches:
+    - CVE-2015-8023_eap_mschapv2_state added, fix authentication bypass when
+    using EAP MSCHAPv2.
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Mon, 16 Nov 2015 12:35:28 +0100
+
+strongswan (5.3.3-2) unstable; urgency=medium
+
+  * debian/rules:
+    - make the dh_install override arch-dependent only since it only acts on
+    arch:any packages, fix FTBFS on arch:all.
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Wed, 04 Nov 2015 13:52:02 +0100
+
+strongswan (5.3.3-1) unstable; urgency=medium
+
+  * debian/rules:
+    - enable the connmark plugin.
+  * debian/control:
+    - add build-dep on iptables-dev.
+  * debian/libstrongswan-standard-plugins:
+    - add connmark plugin to the standard-plugins package.
+  * New upstream release.                                       closes: #803772
+  * debian/strongswan-starter.install:
+    - install new pki --dn manpage to ipsec-starter package. 
+  * debian/patches:
+    - 0001-socket-default-Refactor-setting-source-address-when- and
+    0001-socket-dynamic-Refactor-setting-source-address-when- added (taken
+    from c761db and 9e8b4a in the 1171-socket-default-scope branch), fix
+    source address selection with IPv6 (upstream #1171)
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Tue, 03 Nov 2015 21:56:23 +0100
+
+strongswan (5.3.2-1) unstable; urgency=medium
+
+  * New upstream release.
+  * debian/patches:
+    - 05_ivgen-allow-reusing-same-message-id-twice dropped, included upstream.
+    - CVE-2015-4171_enforce_remote_auth dropped as well.
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Thu, 11 Jun 2015 21:36:33 +0200
+
+strongswan (5.3.1-1) unstable; urgency=high
+
+  * New upstream release.
+  * debian/patches:
+    - strongswan-5.2.2-5.3.0_unknown_payload dropped, included upstream.
+    - 05_ivgen-allow-reusing-same-message-id-twice added, allow reusing the
+    same message ID twice in sequential IV gen. strongSwan issue #980.
+    - CVE-2015-4171_enforce_remote_auth added, fix potential leak of
+    authentication credential to rogue server when using PSK or EAP. This is
+    CVE-2015-4171.
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Thu, 04 Jun 2015 19:18:07 +0200
+
+strongswan (5.3.0-2) unstable; urgency=medium
+
+  * debian/patches:
+    - strongswan-5.2.2-5.3.0_unknown_payload added, fixes a DoS and potential
+      remote code execution vulnerability (CVE-2015-3991).
+  * debian/strongswan-starter.lintian-overrides: add override for
+    command-with-path-in-maintainer-script since it's there to check for file
+    existence.
+  * Upload to unstable.
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Sat, 23 May 2015 15:06:11 +0200
+
+strongswan (5.3.0-1) experimental; urgency=medium
+
+  * New upstream release.
+  * debian/patches:
+    - 01_fix-manpages refreshed for new upstream release.
+    - 02_chunk-endianness dropped, included upstream. 
+    - CVE-2014-9221_modp_custom dropped, included upstream. 
+  * debian/strongswan-starter.install
+    - don't install the _updown and _updown_espmark manpages anymore, they're
+    gone.
+    - also remove the _updown_espmark script, gone too.
+  * debian/copyright updated.
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Wed, 15 Apr 2015 20:59:54 +0200
+
+strongswan (5.2.1-6) unstable; urgency=medium
+
+  * Ship /lib/systemd/system/ipsec.service as a symlink to
+    strongswan.service in strongswan-starter instead of using Alias= in
+    the service file. This makes the ipsec name available to invoke-rc.d
+    before the service gets actually enabled, which avoids some confusion
+    (closes: #781209).
+
+ -- Romain Francoise <rfrancoise@debian.org>  Sat, 04 Apr 2015 17:55:38 +0200
+
+strongswan (5.2.1-5) unstable; urgency=high
+
+  * debian/patches:
+    - debian/patches/CVE-2014-9221_modp_custom added, fix unauthenticated
+    denial of service in IKEv2 when using custom MODP value.
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Mon, 05 Jan 2015 13:11:51 +0100
+
+strongswan (5.2.1-4) unstable; urgency=medium
+
+  * Give up on trying to run the test suite on !amd64, it now times out on
+    both i386 and s390x, our chosen "fast" archs.
+
+ -- Romain Francoise <rfrancoise@debian.org>  Fri, 24 Oct 2014 21:08:17 +0200
+
+strongswan (5.2.1-3) unstable; urgency=medium
+
+  * Disable libtls tests again, they are still too intensive for the buildd
+    network...
+
+ -- Romain Francoise <rfrancoise@debian.org>  Thu, 23 Oct 2014 18:09:27 +0200
+
+strongswan (5.2.1-2) unstable; urgency=medium
+
+  * Cherry-pick commits 701d6ed and 1c70c6e from upstream to fix checksum
+    computation and FTBFS on big-endian hosts.
+  * Run the test suite only on amd64, i386, and s390x. It requires lots of
+    entropy and CPU time, which are typically hard to come by on slower
+    archs.
+  * Re-enable normal keylengths in test suite.
+  * Re-enable libtls tests.
+  * Update Dutch translation, thanks to Frans Spiesschaert (closes: #763798).
+  * Bump Standards-Version to 3.9.6.
+
+ -- Romain Francoise <rfrancoise@debian.org>  Wed, 22 Oct 2014 21:21:37 +0200
+
+strongswan (5.2.1-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Stop shipping /etc/strongswan.conf.d in libstrongswan.
+
+ -- Romain Francoise <rfrancoise@debian.org>  Tue, 21 Oct 2014 19:38:25 +0200
+
+strongswan (5.2.0-2) unstable; urgency=medium
+
+  * Add systemd integration:
+    + Install upstream systemd service file in strongswan-starter.
+    + Alias strongswan.service to ipsec.service to match the sysv init script.
+    + Drop After=syslog.target (as syslog is socket-activated nowadays), but
+      add After=network.target to ensure that charon gets the chance to send
+      deletes on exit.
+    + Add ExecReload for reload action, since the starter script has one.
+    + On linux-any, add build-dep on systemd to ensure that the pkg-config
+      metadata file can be found.
+    + Add build-dep on dh-systemd, and use systemd dh addon.
+  * Remove debian/patches/03_include-stdint.patch.
+
+ -- Romain Francoise <rfrancoise@debian.org>  Wed, 30 Jul 2014 21:37:53 +0200
+
+strongswan (5.2.0-1) unstable; urgency=medium
+
+  * New upstream release.
+  [ Romain Francoise ]
+  * Amend build-dep on libgcrypt to 'libgcrypt20-dev | libgcrypt11-dev'.
+  * Drop hardening-wrapper from build-depends (unused since 5.0.4-1).
+
+  [ Yves-Alexis Perez ]
+  * debian/po:
+    - pt_BR.po updated, thanks Adriano Rafael Gomes.            closes: #752721
+  * debian/patches:
+    03_pfkey-Always-include-stdint.h dropped, included upstream.
+  * debian/strongswan-starter.install:
+    - replace tools.conf by pki.conf and scepclient.conf.
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Fri, 11 Jul 2014 21:57:59 +0200
+
+strongswan (5.1.3-4) unstable; urgency=medium
+
+  * debian/control:
+    - add build-dep on pkg-config.
+  * debian/patches:
+    - 03_pfkey-Always-include-stdint.h added, cherry-picked from upstream git:
+      always include of stdint.h. Fix FTBFS on kFreeBSD.
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Mon, 19 May 2014 15:06:32 +0200
+
+strongswan (5.1.3-3) unstable; urgency=medium
+
+  * debian/watch:
+    - add pgpsigurlmangle to get PGP signature
+  * debian/upstream/signing-key.asc:
+    - bootstrap keyring by adding Andreas Steffen key (0xDF42C170B34DBA77)
+  * debian/control:
+    - add build-dep on libgcrypt20-dev, fix FTBFS.              closes: #747796
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Tue, 13 May 2014 22:05:16 +0200
+
+strongswan (5.1.3-2) unstable; urgency=low
+
+  * Disable the new libtls test suite for now--it appears to be a
+    little too intensive for slower archs.
+
+ -- Romain Francoise <rfrancoise@debian.org>  Sat, 19 Apr 2014 17:45:51 +0200
+
+strongswan (5.1.3-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/control: make strongswan-charon depend on iproute2 | iproute,
+    thanks to Ryo IGARASHI <rigarash@gmail.com> (closes: #744832).
+
+ -- Romain Francoise <rfrancoise@debian.org>  Tue, 15 Apr 2014 19:42:27 +0200
+
+strongswan (5.1.2-4) unstable; urgency=high
+
+  * debian/patches/04_cve-2014-2338.patch: added to fix CVE-2014-2338
+    (authentication bypass vulnerability in IKEv2 code).
+  * debian/control: add myself to Uploaders.
+
+ -- Romain Francoise <rfrancoise@debian.org>  Tue, 08 Apr 2014 20:14:54 +0200
+
+strongswan (5.1.2-3) unstable; urgency=medium
+
+  * debian/patches/
+    - 02_unit-tests-Fix-filtered-enumerator-tests-on-64-bit-b  added, fix
+    testsuite failing on 64 bit big-endian platforms (s390x).
+    - 03_unit-tests-Fix-chunk-clear-armel added, fix testsuite failing on
+    armel.
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Wed, 02 Apr 2014 21:20:33 +0200
+
+strongswan (5.1.2-2) unstable; urgency=medium
+
+  * debian/rules:
+    - use reduced keylengths in testsuite on various arches, hopefully fixing
+      FTBFS when the genrsa test runs.
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Tue, 25 Mar 2014 12:09:49 +0100
+
+strongswan (5.1.2-1) unstable; urgency=medium
+
+  * New upstream release.
+  * debian/control:
+    - add conflicts against openSwan.                           closes: #740808
+  * debian/strongswan-starter,postrm:
+    - remove /var/lib/strongswan on purge.
+  * debian/ipsec.secrets.proto:
+    - stop lying about ipsec showhostkey command.               closes: #600382
+  * debian/patches:
+    - 01_fix-manpages refreshed for new upstream.
+    - 02_include-strongswan.conf.d removed, strongswan.d is now supported
+      upstream.
+  * debian/rules, debian/*.install:
+    - install default configuration files for all plugins.
+  * debian/NEWS:
+    - fix spurious entry.
+    - add a NEWS entry to advertise about the new strongswan.d configuration
+      mechanism. 
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Wed, 12 Mar 2014 11:22:38 +0100
+
+strongswan (5.1.2-0ubuntu8) xenial; urgency=medium
+
+  * Import FTBFS for s390x from Debian 5.1.2-3 upload. (LP: #1521240)
+
+ -- Dimitri John Ledkov <xnox@ubuntu.com>  Mon, 30 Nov 2015 15:46:06 +0000
+
+strongswan (5.1.2-0ubuntu7) xenial; urgency=medium
+
+  * SECURITY UPDATE: authentication bypass in eap-mschapv2 plugin
+    - debian/patches/CVE-2015-8023.patch: only succeed authentication if
+      MSK was established in
+      src/libcharon/plugins/eap_mschapv2/eap_mschapv2.c.
+    - CVE-2015-8023
+  * debian/patches/disable_ntru_test.patch: disable test causing FTBFS
+    until regression is properly investigated.
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Thu, 19 Nov 2015 14:00:17 -0500
+
+strongswan (5.1.2-0ubuntu6) wily; urgency=medium
+
+  * SECURITY UPDATE: user credential disclosure to rogue servers
+    - debian/patches/CVE-2015-4171.patch: enforce remote authentication
+      config before proceeding with own authentication in
+      src/libcharon/sa/ikev2/tasks/ike_auth.c.
+    - CVE-2015-4171
+  * debian/rules: don't FTBFS from unused service file
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Mon, 08 Jun 2015 12:50:38 -0400
+
+strongswan (5.1.2-0ubuntu5) vivid; urgency=medium
+
+  * Add a systemd unit corresponding to strongswan-starter.strongswan.upstart.
+
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Fri, 16 Jan 2015 08:27:54 +0100
+
+strongswan (5.1.2-0ubuntu4) vivid; urgency=medium
+
+  * SECURITY UPDATE: denial of service via DH group 1025
+    - debian/patches/CVE-2014-9221.patch: define MODP_CUSTOM outside of
+      IKE DH range in src/libstrongswan/crypto/diffie_hellman.c,
+      src/libstrongswan/crypto/diffie_hellman.h.
+    - CVE-2014-9221
+
+ -- Tyler Hicks <tyhicks@canonical.com>  Mon, 05 Jan 2015 08:25:29 -0500
+
+strongswan (5.1.2-0ubuntu3) utopic; urgency=low
+
+  * Added "libgcrypt20-dev | libgcrypt11-dev" to build dependencies to fix
+    build.
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Wed, 15 Oct 2014 16:49:18 +0000
+
+strongswan (5.1.2-0ubuntu2) trusty; urgency=medium
+
+  * SECURITY UPDATE: remote authentication bypass
+    - debian/patches/CVE-2014-2338.patch: reject CREATE_CHILD_SA exchange
+      on unestablished IKE_SAs in src/libcharon/sa/ikev2/task_manager_v2.c.
+    - CVE-2014-2338
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Mon, 14 Apr 2014 11:24:34 -0400
+
+strongswan (5.1.2-0ubuntu1) trusty; urgency=low
+
+  * New upstream release.
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Sat, 01 Mar 2014 08:53:17 +0000
+
+strongswan (5.1.2~rc2-0ubuntu2) trusty; urgency=low
+
+  * debian/ipsec.secrets.proto: Removed ipsec.secrets.inc reference.
+  * debian/usr.lib.ipsec.charon: Allow read access to /run/charon.
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Wed, 19 Feb 2014 13:07:16 +0000
+
+strongswan (5.1.2~rc2-0ubuntu1) trusty; urgency=low
+
+  * New upstream release candidate.
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Wed, 19 Feb 2014 12:59:21 +0000
+
+strongswan (5.1.2~rc1-0ubuntu4) trusty; urgency=medium
+
+  * debian/strongswan-tnc-*.install: Fixed files so libraries go into correct
+    packages.
+  * debian/usr.lib.ipsec.stroke: Allow access to strongswan.d directories.
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Mon, 17 Feb 2014 18:12:38 +0000
+
+strongswan (5.1.2~rc1-0ubuntu3) trusty; urgency=low
+
+  * debian/rules: Exclude rdrand.conf in dh_install's --fail-missing.
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Sat, 15 Feb 2014 15:46:46 +0000
+
+strongswan (5.1.2~rc1-0ubuntu2) trusty; urgency=low
+
+  * debian/libstrongswan.install: Moved rdrand plugin configuration to rules
+    as it's only useful on amd64.
+  * debian/watch: Added opts=pgpsigurlmangle option.
+  * debian/upstream/signing-key.asc: Added key: 0xB34DBA77.
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Sat, 15 Feb 2014 15:32:10 +0000
+
+strongswan (5.1.2~rc1-0ubuntu1) trusty; urgency=medium
+
+  * New upstream release candidate.
+  * debian/*.install - include new configuration files for plugins in
+    appropiate packages.
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Sat, 15 Feb 2014 15:03:14 +0000
+
+strongswan (5.1.2~dr3+git20130120-0ubuntu3) trusty; urgency=low
+
+  * debian/control:
+    - Added Breaks/Replaces for all library files which have been moved
+      about (LP: #1278176).
+    - Removed build-dependency on check and added one on dh-apparmor.
+  * debian/strongswan-starter.postinst: Removed further out-dated code and
+    entire section on opportunistic encryption - this was never in strongSwan.
+  * debian/rules: Removed pieces on 'patching ipsec.conf' on build.
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Sun, 09 Feb 2014 23:53:23 +0000
+
+strongswan (5.1.2~dr3+git20130120-0ubuntu2) trusty; urgency=low
+
+  * debian/control: Fixed references to plugin-fips-prf.
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Wed, 22 Jan 2014 11:22:14 +0000
+
+strongswan (5.1.2~dr3+git20130120-0ubuntu1) trusty; urgency=low
+
+  * Upstream Git snapshot for build fixes with regards to entropy.
+  * debian/rules:
+    - Enforcing DEB_BUILD_OPTIONS=nostrip for library integrity checking.
+    - Set TESTS_REDUCED_KEYLENGTHS to one generate smallest key-lengths in
+      tests.
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Mon, 20 Jan 2014 19:00:59 +0000
+
+strongswan (5.1.2~dr3-0ubuntu1) trusty; urgency=low
+
+  * New upstream developer release.
+  * Made changes to packaging per upstream suggestions.
+    - Dropped medcli and medsrv packages - not recommended by upstream at this
+      time.
+    - Dropped ha plugin - needs special kernel.
+    - Improved all package descriptions in general.
+    - Drop build-dep on clearsilver-dev and libfcgi-dev - no longer needed.
+    - Removed debian/*logcheck* files - not relevant to strongSwan.
+    - Split dhcp and farp packages into sub-packages.
+    - Build kernel-libipsec, ntru, systime-fix, and xauth-noauth plugins.
+    - Changes to TNC-related packages.
+  * Created AppArmor profiles for lookip and stroke.
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Wed, 15 Jan 2014 22:52:53 +0000
+
+strongswan (5.1.2~dr2+git20130106-0ubuntu2) trusty; urgency=low
+
+  * libstrongswan.install: Removed lingering unit-tester.so reference.
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Mon, 06 Jan 2014 20:29:59 +0000
+
+strongswan (5.1.2~dr2+git20130106-0ubuntu1) trusty; urgency=low
+
+  * Git snapshot of commit 94e10f15e51ead788d9947e966878ebfdc95b7ce.
+    Incorporates upstream fixes for:
+      - Integrity testing.
+      - Unit test failures on little endian systems.
+  * Dropped debian/patches/02_test_asn1_fix_32bit_time_test.patch - fixed
+    upstream.
+  * debian/rules:
+    - Stop using CK_TIMEOUT_MULTIPLIER.
+    - Stop enabling the test suite only on non-powerpc arches (it runs
+      anyway).
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Mon, 06 Jan 2014 20:17:20 +0000
+
+strongswan (5.1.2~dr2-0ubuntu3) trusty; urgency=low
+
+  * debian/control: Reinstate missing comma in dependencies.
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Fri, 03 Jan 2014 05:39:13 +0000
+
+strongswan (5.1.2~dr2-0ubuntu2) trusty; urgency=low
+
+  * Added debian/patches/02_test_asn1_fix_32bit_time_test.patch - fixes issue
+    where test for >2038 tests on 32-bit platforms is broken.
+    - Reported upstream: https://wiki.strongswan.org/issues/477
+  * debian/control: Added strongswan-plugin-ntru to strongswan-ike Suggests.
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Fri, 03 Jan 2014 05:02:32 +0000
+
+strongswan (5.1.2~dr2-0ubuntu1) trusty; urgency=low
+
+  * New upstream developer release.
+  * debian/rules: Configure with: --enable-af-alg, --enable-ntru, --enable-soup,
+    and --enable-unity.
+  * debian/control:
+    - New plugin packages created for the above
+    - Split fips-prf into its own package.
+    - Added build-dependency on libsoup2.4-dev.
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Thu, 02 Jan 2014 17:37:33 +0000
+
+strongswan (5.1.1-3) unstable; urgency=low
+
+  * Upload to unstable.
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Tue, 04 Mar 2014 21:57:25 +0100
+
+strongswan (5.1.1-2+splitplugins) experimental; urgency=medium
+
+  * debian/control:
+    - drop dependency on host, inherited from openSwan.         closes: #736661
+    - split charon-cmd to a standalone package.
+    - add new plugins packages: libstrongswan-standard-plugins,
+    libstrongswan-extra-plugins and libcharon-extra-plugins.
+    - split strongswan-ike package to strongswan-libcharon (libcharon and
+    default libcharon plugins) and strongswan-charon (charon daemon), keep
+    strongswan-ike as transitional package for now.
+  * debian/po:
+    - sv.po updated, thanks Martin Bagge.                       closes: #725667
+  * debian/charon-cmd.lintian-overrides: override lintian error about
+    charon-cmd rpath.
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Mon, 24 Feb 2014 10:42:49 +0100
+
+strongswan (5.1.1-2) unstable; urgency=medium
+
+  * debian/control:
+    - drop dependency on host, inherited from openSwan.         closes: #736661
+  * debian/po:
+    - sv.po updated, thanks Martin Bagge.                       closes: #725667
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Mon, 24 Feb 2014 10:32:12 +0100
+
+strongswan (5.1.1-1) unstable; urgency=low
+
+  [ Yves-Alexis Perez ]
+  * New upstream bugfix release
+  * debian/rules:
+    - enable and install af-alg plugin on Linux.                closes: #718292
+    - enable certexpire plugin.                                 closes: #718293
+    - enable lookip plugin.                                     closes: #718299
+    - enable error-notify plugin.                               closes: #718304
+    - enable unity plugin.                                      closes: #718289
+  * debian/strongswan-ike.install:
+    - install certexpire and unity plugins.
+    - install lookip binary and plugin.
+    - install error-notify binary and plugin.
+  * debian/strongswan-starter.install:
+    - pki tool is now in /usr/bin.
+    - add pt-tls-client for TCG Trusted Network Connect.
+  * debian/control:
+    - update long description, thanks to Justin B Rye.          closes: #725085
+    - make the pkg-swan-devel list the maintainer, and add René to uploaders.
+    - update standards version to 3.9.5.
+  * debian/po:
+    - eu.po updated, thanks Iñaki Larrañaga Murgoitio.          closes: #726636
+    - ja.po updated.                                            closes: #726059
+    - cs.po updated, thanks Miroslav Kure.                      closes: #728104
+    - ru.po updated, thanks Yuri Kozlov.                        closes: #725709
+    - da.po updated.                                            closes: #725620
+    - nb.po updated, thanks Bjørn Steensrud.                    closes: #725497
+    - fr.po updated, thanks Christian Perrier.                  closes: #725469
+    - tr.po updated, thanks Atila KOÇ.                          closes: #728874
+    - it.po updated, thanks Beatrice Torracca.                  closes: #729122
+    - de.po updated, thanks Helge Kreutzmann.                   closes: #729170
+    - pt.po updated, thanks Américo Monteiro.                   closes: #729823
+    - es.po updated, thanks Matias A. Bellone.                  closes: #733731
+  * debian/patches:
+    - CVE-2013-6075 and CVE-2013-6076 dropped, included upstream.
+    - 01_fix-manpages updated, move pki --issue manpage to section 1.
+  * debian/strongswan-starter.ipsec.init:
+    - use daemon exe in start-stop-daemon test.                 closes: #730661
+
+  [ Romain Francoise ]
+  * debian/rules:
+    - disable built-in integrity tests; they've been broken for years,
+      don't provide security (by design) and we have better tools at the
+      package level anyway.                                     closes: #598138
+    - disable sql and attr-sql plugins, as per discussion in #718302 they
+      are useless without the database driver plugins.
+  * debian/libstrongswan.install:
+    - libchecksum.so is no longer built, remove.
+    - sql plugin is no longer built, remove.
+  * debian/strongswan-starter.install:
+    - 'ipsec pool' is no longer built, remove.
+
+  [ Raphael Geissert ]
+  * Allow the configuration of strongswan.conf to be stored in snippets
+    in /etc/strongswan.conf.d/
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Fri, 24 Jan 2014 21:22:32 +0100
+
+strongswan (5.1.1-0ubuntu17) trusty; urgency=low
+
+  * debian/control:
+    - Make strongswan-ike depend on iproute2.
+    - Added xauth plugin dependency on strongswan-plugin-eap-gtc.
+    - Created strongswan-libfast package.
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Wed, 01 Jan 2014 17:04:45 +0000
+
+strongswan (5.1.1-0ubuntu16) trusty; urgency=low
+
+  * debian/control:
+    - Further splitting of plugins into subpackages (such as all EAP plugins
+      to their own packages).
+    - Added libpcsclite-dev to build-dependencies.
+  * debian/rules:
+    - Sort configure options in alphabetical order.
+    - Added configure option of --enable-eap-aka-3gpp2, --enable-eap-dynamic,
+      --enable-eap-sim-file, --enable-eap-sim-pcsc,
+      --enable-eap-simaka-pseudonym, --enable-eap-simaka-reauth and
+      --enable-eap-simaka-sql.
+    - Don't exclude medsrv from install.
+  * Moved eap-identity.so to libstrongswan package as it's used by all the
+    other EAP plugins.
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Tue, 31 Dec 2013 21:25:50 +0000
+
+strongswan (5.1.1-0ubuntu15) trusty; urgency=low
+
+  * debian/control:
+    - Split plugins from libstrongswan package into modular subpackages.
+    - Added libmysqlclient-dev to build-dependencies.
+    - strongswan-ike: Set to depend on either strongswan-plugins-openssl or
+      strongswan-plugins-gcrypt.
+    - strongswan-ike: All other plugins added to Suggests.
+    - Created two new TNC packages: strongswan-tnc-ifmap and
+      strongswan-tnc-pdp and added to tnc-imcvs Suggests.
+  * debian/rules: Added to CONFIGUREARGS: --enable-certexpire,
+    --enable-error-notify, --enable-mysql, --enable-load-tester,
+    --enable-radattr, --enable-tnc-pdp, and --enable-whitelist.
+  * debian/strongswan-ike.install: Moved eap-identity.so to -tnc-imcvs package.
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Tue, 31 Dec 2013 16:15:32 +0000
+
+strongswan (5.1.1-0ubuntu14) trusty; urgency=low
+
+  * debian/rules:
+    - CK_TIMEOUT_MULTIPLIER back down to 6.
+    - Disable unit tests on powerpc.
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Tue, 31 Dec 2013 07:39:48 +0000
+
+strongswan (5.1.1-0ubuntu13) trusty; urgency=low
+
+  * debian/rules: CK_TIMEOUT_MULTIPLIER to 10 as just powerppc is being stubborn.
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Tue, 31 Dec 2013 07:23:42 +0000
+
+strongswan (5.1.1-0ubuntu12) trusty; urgency=low
+
+  * debian/rules: Bring CK_TIMEOUT_MULTIPLIER up to 6 to fix powerppc and
+    armhf.
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Tue, 31 Dec 2013 07:03:40 +0000
+
+strongswan (5.1.1-0ubuntu11) trusty; urgency=low
+
+  * 02_increase-test_rsa_generate-timeout.patch: Removed - only fixed build on
+    one extra arch.
+  * debian/rules: Set CK_TIMEOUT_MULTIPLIER to 4.
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Tue, 31 Dec 2013 06:51:47 +0000
+
+strongswan (5.1.1-0ubuntu10) trusty; urgency=low
+
+  * debian/patches: Added patch 02_increase-test_rsa_generate-timeout.patch -
+    - Increases RSA key generate test timeout to 30 seconds so that it doesn't
+      fail on armhf, arm64, and powerppc.
+  * Contrary to what the last changelog entry says, we are still running
+    strongswan as root (with AppArmor protection).
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Tue, 31 Dec 2013 06:06:47 +0000
+
+strongswan (5.1.1-0ubuntu9) trusty; urgency=low
+
+  * debian/rules: Added to configure options:
+    - --enable-tnc-ifmap: enable TNC IF-MAP module.
+    - --enable-duplicheck: enable duplicheck plugin.
+    - --enable-imv-swid, --enable-imc-swid: Added.
+    - Run strongswan as it's own user.
+  * debian/strongswan-starter.install: Install duplicheck.
+  * debian/strongswan-tnc-imcvs.install: Install swidtags.
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Mon, 30 Dec 2013 19:33:27 +0000
+
+strongswan (5.1.1-0ubuntu8) trusty; urgency=low
+
+  * debian/rules: Added to configure options:
+    - --enable-unit-tests: check unit testing on build.
+    - --enable-unbound: for validating DNS lookups.
+    - --enable-dnscert: for DNSCERT peer authentication.
+    - --enable-ipseckey: for IPSEC key authentication.
+    - --enable-lookip: for LookIP functionality.
+    - --enable-coupling: certificate coupling functionality.
+  * debian/control: Added check, libldns-dev, libunbound-dev to
+    build-dependencies.
+  * debian/libstrongswan.install: Install new plugin .so's.
+  * debian/strongswan-starter.install: Added lookip.
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Mon, 30 Dec 2013 17:52:07 +0000
+
+strongswan (5.1.1-0ubuntu7) trusty; urgency=low
+
+  * strongswan-starter.install: Moved pt-tls-client to tnc-imcvs (to prevent
+    the former from depending on the latter).
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Mon, 30 Dec 2013 17:30:19 +0000
+
+strongswan (5.1.1-0ubuntu6) trusty; urgency=low
+
+  * debian/strongswan-starter.prerm: Stop strongswan service on package
+    removal (as opposed to using the old init.d script).
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Mon, 30 Dec 2013 17:22:10 +0000
+
+strongswan (5.1.1-0ubuntu5) trusty; urgency=low
+
+  * debian/rules:
+    - CONFIGUREARGS: Merged Debian and RPM options.
+    - Brings in TNC functionality.
+  * debian/control:
+    - Added build-dependency on libtspi-dev.
+    - Created strongswan-tnc-imcvs binary package for TNC components.
+    - Added strongswan-tnc-imcvs to libstrongswan's Suggests.
+  * debian/libstrongswan.install:
+    - Included newly built MD4 and SQLite libraries.
+    - Removed 'tnc' references (moved to TNC package).
+  * debian/strongswan-tnc-imcvs.install: Created - handle new TNC libraries and
+    binaries.
+  * debian/usr.lib.ipsec.charon: Allow access to TNC modules.
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Mon, 30 Dec 2013 14:05:43 +0000
+
+strongswan (5.1.1-0ubuntu4) trusty; urgency=low
+
+  * debian/usr.lib.ipsec.charon: Added - AppArmor profile for charon.
+  * debian/strongswan-starter.postrm: Removed 'update-rc.d ipsec remove' call.
+  * debian/control: strongswan-ike - Stop depending on ipsec-tools. 
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Mon, 30 Dec 2013 05:35:17 +0000
+
+strongswan (5.1.1-0ubuntu3) trusty; urgency=low
+
+  * strongswan-starter.strongswan.upstart - Only start strongSwan when a
+    network connection is available.
+  * debian/control: Downgrade build-dep version of dpkg-dev from 1.16.2 to
+    1.16.1 - to make precise backporting easier.
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Thu, 12 Dec 2013 10:43:15 +0000
+
+strongswan (5.1.1-0ubuntu2) trusty; urgency=low
+
+  * strongswan-starter.strongswan.upstart - Created Upstart job for
+    strongSwan.
+  * debian/rules: Set dh_installinit to install above file.
+  * debian/strongswan-starter.postinit:
+    - Removed section about runlevel changes, it's almost 2014.
+    - Adapted service restart section for Upstart.
+    - Remove old symlinks to init.d files is necessary.
+  * debian/strongswan-starter.dirs: Don't touch /etc/init.d.
+
+ -- Jonathan Davies <jonathan.davies@canonical.com>  Wed, 11 Dec 2013 23:10:28 +0000
+
+strongswan (5.1.1-0ubuntu1) trusty; urgency=low
+
+  * New upstream release.
+  * Removed: debian/patches/CVE-2013-6075, CVE-2013-6076.patch - upsteamed.
+  * debian/control: Updated Standards-Version to 3.9.5 and applied
+    XSBC-Original-Maintainer policy.
+  * strongswan-starter.install:
+    - pki tool is now in /usr/bin.
+    - Install pt-tls-client.
+    - Install manpages (LP: #1206263).
+
+ -- Jonathan Davies <jpds@ubuntu.com>  Sun, 01 Dec 2013 17:43:59 +0000
+
+strongswan (5.1.0-3) unstable; urgency=high
+
+  * urgency=high for the security fixes.
+  * debian/patches
+    - CVE-2013-6075 added, fix remote denial of service and authorization
+      bypass.
+    - CVE-2013-6076 added, fix remote denial of service in IKEv1 code.
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Tue, 29 Oct 2013 21:07:04 +0100
+
+strongswan (5.1.0-2) unstable; urgency=medium
+
+  * urgency=medium since we already spent 16 days in unstable and the fix is
+    trivial
+  * debian/control:
+    - strongswan-ike: only depends on iproute on linux arches.
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Thu, 17 Oct 2013 21:40:35 +0200
+
+strongswan (5.1.0-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/libstrongswan.install:
+    - install new rc2, pkcs12 and sshkey plugins.
+  * debian/control:
+    - update standards version to 3.9.4.
+    - add build-dep on dh-autoreconf.
+  * debian/rules:
+    - use autoreconf addon to refresh autotools helper files and gain support
+      for ARM64.
+    - enable charon-cmd command line tool.
+  * debian/source/options: ignore files regenerated by autoreconf addon.
+  * debian/strongswan-ike.install:
+    - install charon-cmd command and manpage.
+  * debian/NEWS:
+    - warn users about charon replacing pluto as IKEv1 daemon and provide some
+      migration pointers.
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Mon, 30 Sep 2013 20:59:04 +0200
+
+strongswan (5.0.4-3) experimental; urgency=low
+
+  * debian/rules, debian/libstrongswan.install:
+    - only install rdrand plugin on i386 and amd64.
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Sat, 18 May 2013 09:26:22 +0200
+
+strongswan (5.0.4-2) experimental; urgency=low
+
+  * debian/rules:
+    - only enable RdRand on i386 and amd64.
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Mon, 06 May 2013 13:14:03 +0200
+
+strongswan (5.0.4-1) experimental; urgency=low
+
+  * New upstream release.
+    - Fix for ECDSA signature verification vulnerability (CVE-2013-2944).
+  * debian/patches:
+    - 01_fix-manpages refreshed.
+    - 02_add-LICENSE dropped, included upstream.
+    - 03_Pass-lo-as-faked-tundev-to-NM-as-it-now-needs-a-vali removed,
+      included upstream.
+    - 04-Fixed-IPv6-source-address-lookup dropped, included upstream. 
+  * debian/rules:
+    - --enable-smartcard, --with-default-pkcs11 and --enable-nat-transport not
+      valid anymore for ./configure, remove them.
+    - add --enable-xauth-eap and --enable-xauth-pam.
+    - remove pluto handling since it's gone
+    - don't special-case XAuth on kFreeBSD anymore.
+    - add --enable-attr-sql and --enable-rdrand.
+    - build using all hardening flags.
+    - use -Wl,--as-needed -Wl,-O1 for LDFLAGS.
+  * debian/control:
+    - drop strongswan-ikev1 package
+    - rename strongswan-ikev2 package to strongswan-ike for now and makes it
+      replace strongswan-ikev1 and strongswan-ikev2.
+    - rephrase long description to remove references to pluto.
+    - provide transition -ikev{1,2} packages for upgrades.
+  * debian/strongswan-ikev1.install removed.
+  * debian/strongswan-ikev2.* renamed to strongswan-ike.
+  * debian/strongswan-nm.install:
+    - NetworkManager plugin is now a separate executable.
+  * debian/libstrongswan.install:
+    - install new pkcs7, xauth-eap, xauth-generic, xauth-pam and nonce plugins.
+    - install libpttls files (experimental implementation of PT-TLS, RFC 6876)
+    - install rdrand plugin.
+  * debian/strongswan.docs: CREDITS file is gone.
+  * debian/ipsec.secrets.proto: remove reference to pluto.
+  * debian/strongswan-starter.* remove references to pluto.
+  * debian/po: update potfiles for new phrasing.
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Sun, 05 May 2013 11:06:20 +0200
+
+strongswan (4.6.4-6) unstable; urgency=low
+
+  * debian/rules:
+    - revert dropping privileges, it breaks too many setups for now and it's
+      not possible to disable it.           reopens #529854 and closes: #680722
+  * debian/control:
+    - add Breaks/Replaces strongswan-ikev2 on libstrongswan because of moved
+      plugins.                                                  closes: #681312
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Sat, 01 Dec 2012 14:24:49 +0100
+
+strongswan (4.6.4-5) unstable; urgency=low
+
+  [ Yves-Alexis Perez ]
+  * debian/control:
+    - and finally make libcap-dev linux-any too...
+    - make -ikev1 linux-any since pluto can't be build on FreeBSD.
+  * debian/rules:
+    - stop installing logcheck rules manually.                  closes: #679745
+    - handle non kFreeBSD more carefully                        closes: #640928
+      + don't enable NM and Linux capabilities drop;
+      + disable pluto (and xauth plugin);
+      + don't enable farp and dhcp, enable kernel-pf{key,route} plugins
+  * Handle logcheck files from dh_installlogcheck and thus name them correctly
+    so they are not installed in the wrong package.             closes: #679745
+  * debian/po
+    - add turkish translation, thanks Atila KOÇ.                closes: #659879
+  * debian/patches:
+    - 04-Fixed-IPv6-source-address-lookup added, backported from upstream. 
+      Fix IPv6 tunnels, broken because of bad handling of source routing.
+
+  [ Laurent Bigonville ]
+  * Do not use multi-arch paths, this makes no sense as only one instance of
+    the daemon can be run and all libraries are private.
+  * d/p/03_Pass-lo-as-faked-tundev-to-NM-as-it-now-needs-a-vali.patch: NM now
+    requires a tundev, pass the loopback interface to make it happy
+    (thanks to Martin Willi)
+  * debian/control: Fix Vcs-Browser URL
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Sat, 07 Jul 2012 14:21:03 +0200
+
+strongswan (4.6.4-4) unstable; urgency=low
+
+  * debian/control:
+    - libnm-glib-vpn-dev also is linux-any, fix build-deps.
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Sat, 30 Jun 2012 18:54:00 +0200
+
+strongswan (4.6.4-3) unstable; urgency=low
+
+  * debian/strongswan-starter.postrm
+    - remove strongswan user on purge.
+  * debian/rules:
+    - enable gcrypt plugin.                                     closes: #600326
+  * debian/libstrongswan.install:
+    - ship gcrypt plugin.
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Sat, 30 Jun 2012 17:08:08 +0200
+
+strongswan (4.6.4-2) unstable; urgency=low
+
+  * Upload to unstable.
+  * debian/rules:
+    - use the strongswan user.                                  closes: #529854
+  * debian/control:
+    - fix libnm-glib-vpn-dev build-dep, it's linux-any.
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Sat, 30 Jun 2012 15:37:58 +0200
+
+strongswan (4.6.4-1) experimental; urgency=low
+
+  * New upstream release.                                       closes: #664190
+    - stop including individual glib headers.                   closes: #665612
+  * debian/patches:
+    - drop all patches, they're all included upstream now.
+  * debian/*.install:
+    - drop destination path
+    - libs are in ipsec folder now
+    - add libradius, libtls, libtnccs and libsimaka to libstrongswan.
+    - add tnc-tnccs, pkcs8 and cmac plugins to libstrongswan.
+    - use multiarch paths
+    - move ldap, curl, kernel-netlink and attr* plugins to libstrongswan,
+      since they are used by pluto too.                         closes: #611846
+  * debian/control:
+    - add myself to uploaders, in hope that some others will join.
+    - update standards version to 3.9.3.
+    - add depend on adduser to strongswan-starter for use in maintainer
+      scripts.
+    - update debhelper build-dep to 9 and add dpkg-dev 1.16.2 build-dep for
+      hardening support.
+    - make strongswan-nm linux-any and adjust network-manager-dev build-dep to
+      only happen on linux arches.                              closes: #640928
+  * debian/compat bumped to 9.
+  * debian/rules:
+    - enable hardening flags with PIE and bindnow.
+    - use multiarch paths.
+    - inconditionnally enable network-manager. 
+    - switch to dh.
+    - ignore plugins in dh_makeshlibs.
+    - don't generate maintainer scripts snippets for init scripts, it's
+      already handled (atlhough we might want to change that later)
+    - stop bypassing dh_installdocs.
+    - disable DES and Blowfish plugin as they are under a 4 clauses BSD-like
+      license.
+  * debian/libstrongswan.lintian-overrides,
+    debian/libstrongswan-ikev2.lintian-overrides:
+    - override warning for hardening flags, we do use them.
+  * debian/patches:
+    - 01_fix-manpages added, fix space in NAME section.
+    - 02_add-LICENSE added, add the license file from upstream not yet present
+      in tarball.
+  * debian/copyright completely rewritten.
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Fri, 29 Jun 2012 21:24:37 +0200
+
+strongswan (4.5.2-1.5) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Fix "package must not include /var/lock/subsys":
+    don't ship /var/lock/subsys but create it in the init script.
+    (Closes: #667764)
+
+ -- gregor herrmann <gregoa@debian.org>  Fri, 15 Jun 2012 16:21:27 +0200
+
+strongswan (4.5.2-1.4) unstable; urgency=high
+
+  * Non-maintainer upload by the Security Team.
+  * debian/patches:
+    - 0001-Fix-boolean-return-value-if-an-empty-RSA-signature-i added,
+      backported from upstream. Fix CVE-2012-2388 (when using gmp plugin,
+      zero length RSA signatures are considered valid).
+    - 0001-Added-support-for-the-resolvconf-framework-in-resolv added,
+      correctly handle resolvconf-managed /etc/resolv.conf.     closes: #664873
+
+ -- Yves-Alexis Perez <corsac@debian.org>  Thu, 24 May 2012 17:55:51 +0200
+
+strongswan (4.5.2-1.3) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Fix pending l10n issues. Debconf translations:
+    - Dutch; (Jeroen Schot).  Closes: #631502
+    - Norwegian Bokmål, (Bjørn Steensrud).  Closes: #654411
+    - Polish (Michał Kułach).  Closes: #658125
+
+ -- Christian Perrier <bubulle@debian.org>  Wed, 08 Feb 2012 07:22:07 +0100
+
+strongswan (4.5.2-1.2) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Drop libopensc2-dev from Build-Depends; that library is now private to
+    opensc and is not required at build time as it's loaded by dlopen() anyway.
+    (Closes: #635890)
+
+ -- Laurent Bigonville <bigon@debian.org>  Thu, 08 Sep 2011 16:50:11 +0200
+
+strongswan (4.5.2-1.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * debian/strongswan-starter.ipsec.init: Init script should depends on
+    remote_fs instead of local_fs, also provide ipsec instead of vpn as
+    the other ipsec implementations (Closes: #629675)
+  * debian/patches/0001-fix-fprintf-format.patch: Fix FTBFS with gcc 4.6,
+    taken from upstream (Closes: #614486)
+  * debian/control: Tighten dependency version against libstrongswan
+    (Closes: #626170)
+  * debian/strongswan-starter.lintian-overrides, debian/rules:
+    Correctly set restricted permissions on /etc/ipsec.d/private/
+    and /var/lib/strongswan (Closes: #598827)
+
+ -- Laurent Bigonville <bigon@debian.org>  Mon, 04 Jul 2011 10:58:59 +0200
+
+strongswan (4.5.2-1) unstable; urgency=low
+
+  * New upstream version 4.5.2. This removes a lot of old manpages that were
+    not properly updated since freeswan.
+    Closes: #616482: strongswan-ikev1: virtual ips not released if xauth name 
+                     does not match id
+    Closes: #626169: strongswan: ipsec tunnels fail because charon segfaults
+    Closes: #625228: strongswan-starter: left-/rightnexthop options are broken
+    Closes: #614105: strongswan-ikev2: charon continually respawns
+  * Fix typo in debian/rules that precluded --enable-nm from being passed to
+    configure (LP: #771778).
+    Closes: #627775: strongswan-nm package is missing nm module
+  * Make sure to install all newly added plugins (and generally files created
+    by make install) by calling dh_install with --fail-missing. Install some
+    newly enabled crypto plugins in the libstrongswan package.
+    Closes: #627783: Please disable modules that are not installed in package 
+                     at build time
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Thu, 19 May 2011 13:42:21 +0200
+
+strongswan (4.5.1-1) unstable; urgency=low
+
+  * New upstream version
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Sat, 05 Mar 2011 09:27:49 +0100
+
+strongswan (4.5.0-1) unstable; urgency=low
+
+  * New upstream version 4.5.0
+  * Enabled new configure options for additional libstrongswan plugins:
+    --enable-ctr --enable-ccm --enable-gcm --enable-addrblock --enable-led
+    --enable-pkcs11 --enable-eap-tls --enable-eap-ttls --enable-eap-tnc
+  * Enable NAT-Traversal with transport mode support so that strongswan
+    can be used for an L2TP/IPsec gateway (e.g. for Windows or mobile phone
+    clients).
+  * Special handling for strongswan-nm package during build time: only build
+    and install if headers are really available. This supports easier 
+    backporting by simply ignoring build-deps and therefore to build all
+    packages except the strongswan-nm without any changes to the source 
+    package.
+  * Install test-vectors and revocation plugins for libstrongswan.
+    Closes: #600996: strongswan-starter: plugin 'revocation' failed to load
+  * Acknowledge translations NMU.
+    Closes: #598925: Intent to NMU or help for an l10n upload of strongswan 
+                     to fix pending po-debconf l10n bugs
+    Closes: #598925 #599888 #600354 #600409 #602449 #603723 #603779
+  * Update Brazilian Portugese debconf translation.
+    Closes: #607404: strongswan: [INTL:pt_BR] Brazilian Portuguese debconf 
+		     templates translation
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Sun, 28 Nov 2010 13:09:42 +0100
+
+strongswan (4.4.1-5.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+    - Fix pending l10n issues. Debconf translations:
+    - Vietnamese (Clytie Siddall).  Closes: #598925
+    - Japanese (Hideki Yamane).  Closes: #599888
+    - Czech (Miroslav Kure).  Closes: #600354
+    - Spanish (Francisco Javier Cuadrado).  Closes: #600409
+    - Danish (Joe Hansen).  Closes: #602449
+    - Basque (Iñaki Larrañaga Murgoitio).  Closes: #603723
+    - Italian (Vincenzo Campanella).  Closes: #603779
+
+ -- Christian Perrier <bubulle@debian.org>  Wed, 17 Nov 2010 20:21:21 +0100
+
+strongswan (4.4.1-5) unstable; urgency=medium
+
+  * Fixed init script for restart to work when either pluto or charon
+    are not installed.
+    Closes: #598074: init script doesn't re-start the service on restart
+  * Enable built-in crypto test vectors.
+    Closes: #598136: strongswan: Please enable --enable-test-vectors 
+                     configure option
+  * Install libchecksum.so into correct directory (/usr/lib/ipsec instead of
+    /usr/lib). It still doesn't fix #598138 because of the size mismatch.
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Sun, 26 Sep 2010 13:48:00 +0200
+
+strongswan (4.4.1-4) unstable; urgency=medium
+
+  * dh_clean should not be called by the install target. This caused the
+    arch: all package strongswan to be built but not included in the changes
+    file.
+    Closes: #593768: strongswan: 4.4.1 unavailable in testing notwhistanding 
+                     a freeze-exception request
+  * Rewrote parts of the init.d script to make stop/restart more robust
+    when pluto or charon fail.
+  * Closes: #595885: strongswan: FTBFS in squeeze: No package 'libnm_glib_vpn' 
+                     found
+    This bug was actually closed in 4.4.0 with changed dependencies.
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Thu, 19 Sep 2010 13:08:36 +0200
+
+strongswan (4.4.1-3) unstable; urgency=low
+
+  * Change make clean to make distclean to make package building
+    idempotent.
+    Really closes: Bug#593313: strongswan: FTBFS because clean rule fails
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Sun, 22 Aug 2010 21:39:03 +0200
+
+strongswan (4.4.1-2) unstable; urgency=low
+
+  * Recompiled with dpkg-buildpackage instead of svn-buildpackage to
+    make the clean target work. I am still looking for the root cause of 
+    this quilt 3.0 format and svn-buildpackage incompatibility.
+    Closes: Bug#593313: strongswan: FTBFS because clean rule fails
+  * Removed the --enable-socket-* configure options again. Having multiple
+    socket variants for charon would force to explicitly enable one (in case
+    of pluto co-existance the socket-raw) in strongswan.conf. Disabling the
+    other variants for now at build-time relieves us from changing the 
+    default config file and might be more future-proof concerning future
+    upstream changes to configure options.
+    Really closes: #587583
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Sat, 21 Aug 2010 23:28:47 +0200
+
+strongswan (4.4.1-1) unstable; urgency=low
+
+  * New upstream release.
+    Closes: #587583: strongswan 4.4.0-2 does not work here: charon seems not 
+                     to ignore all incoming requests/answers
+    Closes: #506320: strongswan: include directives error and ikev2
+  * Fix typo in debconf templates.
+    Closes: #587564: strongswan: Minor typos in Debconf template
+  * Updated debconf translations.
+    Closes: #587562: strongswan: [INTL:de] updated German debconf translation
+    Closes: #580954: [INTL:es] Spanish debconf template translation for 
+                     strongswan
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Mon, 09 Aug 2010 11:37:25 +0200
+
+strongswan (4.4.0-3) unstable; urgency=low
+
+  * Updated debconf translations.
+    Closes: #587562: strongswan: [INTL:de] updated German debconf translation
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Wed, 30 Jun 2010 09:50:31 +0200
+
+strongswan (4.4.0-2) unstable; urgency=low
+
+  * Force enable-socket-raw configure option and enable list-missing option 
+    for dh_install to make sure that all required plugins get built and 
+    installed.
+    Closes: #587282: plugins missing
+  * Updated debconf translations.
+    Closes: #587052: strongswan: [INTL:fr] French debconf templates 
+            translation update
+    Closes: #587159: strongswan: [INTL:ru] Russian debconf templates 
+            translation update
+    Closes: #587255: strongswan: [INTL:pt] Updated Portuguese 
+            translation for debconf messages
+    Closes: #587241: [INTL:sv] po-debconf file for strongswan
+  * Disabled cisco-quirks configure option, as it causes pluto to emit a 
+    bogus Cicso vendor ID attribute. Some Cicso VPN clients might not work
+    without this, but it is less confusing for standards-compliant remote
+    gateways.
+  * Removed leftover attribute plugin source caused by incomplete svn-upgrade
+    call.
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Thu, 24 Jun 2010 22:32:18 +0200
+
+strongswan (4.4.0-1) unstable; urgency=HIGH
+
+  * New upstream release, now with a high-availability plugin.
+  * Added patch to fix snprintf bug.
+  * Enable building of ha, dhcp, and farp plugins.
+  * Enable capability dropping (now depends on libcap). Switching
+    user to new system user strongswan (with nogroup) after startup
+    is still disabled until the iptables updown script can be made
+    to work.
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Tue, 25 May 2010 21:03:52 +0200
+
+strongswan (4.3.6-1) unstable; urgency=low
+
+  * UNRELEASED
+
+  * New upstream release, now build-depends on gperf.
+    Closes: #577855: New upstream release 4.3.6
+    Closes: #569553: strongswan: Certificates CNs containing email address 
+                     OIDs are not correctly parsed
+    Closes: #557635: strongswan charon does not rekey forever
+    Closes: #569299: Please update configure check to use new nm-glib 
+                     pkgconfig file name
+  * Switch to dpkg-source 3.0 (quilt) format
+  * Synchronize debconf handling with current openswan 2.6.25 package to keep
+    X509 certificate handling etc. similar. Thanks to Harald Jenny for 
+    implementing these changes in openswan, which I just converted to 
+    strongswan.
+  * Now also build a strongswan-dbg package to ship debugging symbols.
+  * Include attr plugin in strongswan-ikev2 package. Thanks to Christoph Lukas
+    for pointing out that this was missing.
+    Closes: #569550: strongswan: Please include attr plugin
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Tue, 23 Feb 2010 10:39:21 +0000
+
+strongswan (4.3.4-1) unstable; urgency=low
+
+  * New upstream release.
+  * This release supports integrity checking of libraries, which is
+    now enabled at build-time and can be enabled at run-time using 
+        libstrongswan {
+          integrity_test = yes
+        }
+    in /etc/strongswan.conf.
+  * Don't disable internal crypto libraries for pluto. They might be
+    required when working with older ipsec.conf files.
+  * charon now supports "include" directives in ipsec.secrets for
+    compatibility with how the maintainer script includes RSA private keys.
+  * Patched starter to also look at routing table "default" when table
+    "main" doesn't have a default entry. This makes dealing with
+    "%defaulroute" in ipsec.conf more flexible.
+    Update: It seems Astaro was quicker then me sending a patch with
+    exactly that aim to upstream. Now applied this one, which will be
+    part of future upstream releases and uses netlink to read routing
+    tables.
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Wed, 21 Oct 2009 11:14:56 +0000
+
+strongswan (4.3.2-1) unstable; urgency=HIGH
+
+  Urgency high because of security issue and FTBFS.
+  * New upstream release, fixes security bug.
+  * Fix padlock handling for i386 in debian/rules.
+    Closes: #525652 (FTBFS on i386)
+  * Acknowledge NMUs by security team.
+    Closes: #533837, #531612
+  * Add "Conflicts: strongswan (< 4.2.12-1)" to libstrongswan, 
+    strongswan-starter, strongswan-ikev1, and strongswan-ikev2 to force
+    update of the strongswan package on installation and avoid conflicts
+    caused by package restructuring.
+    Closes: #526037: strongswan-ikev2 and strongswan: error when trying to 
+                     install together
+    Closes: #526486: strongswan and libstrongswan: error when trying to 
+                     install together
+    Closes: #526487: strongswan-ikev1 and strongswan: error when trying to 
+                     install together
+    Closes: #526488: strongswan-starter and strongswan: error when trying to 
+                     install together
+  * Debconf templates and debian/control reviewed by the debian-l10n-
+    english team as part of the Smith review project. Closes: #528073
+  * Debconf translation updates:
+    Closes: #525234: [INTL:ja] Update po-debconf template translation (ja.po) 
+    Closes: #528323: [INTL:sv] po-debconf file for strongswan 
+    Closes: #528370: [INTL:vi] Vietnamese debconf templates translation update 
+    Closes: #529027: [INTL:pt] Updated Portuguese translation for debconf messages
+    Closes: #529071: [INTL:fr] French debconf templates translation update 
+    Closes: #529592: nb translation of debconf PO for strongSWAN 
+    Closes: #529638: [INTL:ru] Russian debconf templates translation 
+    Closes: #529661: Updated Czech translation of strongswan debconf messages 
+    Closes: #529742: [INTL:eu] strongswan debconf basque translation 
+    Closes: #530273: [INTL:fi] Finnish translation of the debconf templates
+    Closes: #529063: [INTL:gl] strongswan 4.2.14-2 debconf translation update
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Sat, 18 Apr 2009 20:28:51 +0200
+
+strongswan (4.2.14-1.2) unstable; urgency=high
+
+  * Non-maintainer upload.
+  * Fix build on i386 
+    Closes: #525652: FTBFS on i386: 
+    libstrongswan-padlock.so*': No such file or directory 
+  * Fix Two Denial of Service Vulnerabilities
+    Closes: #533837: strongSwan Two Denial of Service Vulnerabilities
+
+ -- Ruben Puettmann <ruben@puettmann.net>  Sun, 21 Jun 2009 17:50:02 +0200
+ 
+strongswan (4.2.14-1.1) unstable; urgency=high
+ 
+  * Non-maintainer upload by the Security Team.
+  * Fix two possible null pointer dereferences leading to denial
+    of service via crafted IKE_SA_INIT, CREATE_CHILD_SA or
+    IKE_AUTH request (CVE-2009-1957; CVE-2009-1958; Closes: #531612).
+
+ -- Nico Golde <nion@debian.org>  Mon, 15 Jun 2009 13:06:05 +0200
+ 
+strongswan (4.2.14-1) unstable; urgency=low
+
+  * New upstream release, which incorporates the fix. Removed dpatch for it.
+    Closes: #521950: CVE-2009-0790: DoS
+  * New support for EAP RADIUS authentication, enabled for this package.
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Wed, 01 Apr 2009 22:17:52 +0200
+
+strongswan (4.2.13-2) unstable; urgency=low
+
+  * Fix DoS issue via malicious Dead Peer Detection packet. Thanks to the 
+    security team for providing the patch.
+    Closes: #521950: CVE-2009-0790: DoS
+    Gerd v. Egidy discovered that the Pluto IKE daemon in openswan is prone
+    to a denial of service attack via a malicious packet.
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Tue, 31 Mar 2009 12:00:51 +0200
+
+strongswan (4.2.13-1) unstable; urgency=low
+
+  * New upstream release. This is now compatible with network-manager 0.7
+    in Debian, so start building the strongswan-side support. The actual
+    plugin will need to be another source package.
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Sun, 22 Mar 2009 10:59:31 +0100
+
+strongswan (4.2.12-1) unstable; urgency=low
+
+  * New upstream release. Starting with this version, the strongswan
+    packages is modularized and includes support for plugins like the 
+    NetworkManager plugin. Many details were adopted from Martin Willi's
+    packages.
+  * Dropping support for raw RSA public/private keypairs, as charon does
+    not support it.
+  * Explicitly remove directories /etc/ipsec.d and /var/run/pluto on purge.
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Sun, 01 Mar 2009 10:46:08 +0000
+
+strongswan (4.2.9-1) unstable; urgency=low
+
+  * New upstream release, fixes a MOBIKE issue.
+    Closes: #507542: strongswan: endless loop
+  * Explicitly enable compilation with libcurl for CRL fetching
+    Closes: #497756: strongswan: not compiled with curl support; crl 
+                     fetching not available
+  * Enable compilation with SSH agent support.
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Fri, 05 Dec 2008 17:21:42 +0100
+
+strongswan (4.2.4-5) unstable; urgency=high
+
+  Reason for urgency high: this is potentially security relevant.
+  * Patch backported from 4.2.7 to fix a potential DoS issue.
+    Thanks to Thomas Kallenberg for the patch.
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Mon, 29 Sep 2008 10:35:30 +0200
+
+strongswan (4.2.4-4) unstable; urgency=low
+
+  * Tweaked configure options for lenny to remove somewhat experimental,
+    incomplete, or unnecessary features. Removed --enable-xml,
+    --enable-padlock, and --enable-manager and added --disable-aes,
+    --disable-des, --disable-fips-prf, --disable-gmp, --disable-md5,
+    --disable-sha1, and --disable-sha2 because openssl already
+    contains this code, we depend on it and thus don't need it twice.
+    Padlock support does not do much, because the bulk encryption uses
+    it anyway (being done internally in the kernel) and using padlock
+    for IKEv2 key agreement adds complexity for little gain.
+    Thanks to Thomas Kallenberg of strongswan upstream team for 
+    suggesting these changes. The package is now noticable smaller.
+  * Also remove dbus dependency, which is no longer necessary.
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Mon, 01 Sep 2008 08:59:10 +0200
+
+strongswan (4.2.4-3) unstable; urgency=low
+
+  * Changed configure option to build peer-to-peer service again.
+    Closes: #494678: strongswan: configure option --enable-p2p changed to 
+                     --enable-mediation
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Tue, 12 Aug 2008 20:08:26 +0200
+
+strongswan (4.2.4-2) unstable; urgency=medium
+
+  Urgency medium because this fixes an FTFBS bug on non-i386.
+  * Only compile padlock crypto acceleration support for i386. Thanks for
+    the patch!
+    Closes: #492455: strongswan: FTBFS: Uses i386 assembler on non-i386 
+                     arches. 
+  * Updated Swedish debconf translation.
+    Closes: #492902: [INTL:sv] po-debconf file for strongswan
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Thu, 07 Aug 2008 13:02:54 +0200
+
+strongswan (4.2.4-1) unstable; urgency=medium
+
+  Urgency medium because this new upstream versions no longer uses
+  dbus and thus fixed the grave bug from the last Debian package. This
+  version should transit to testing.
+  * New upstream release. Starting with version 4.2.0, crypto algorithms have
+    beeen modularized with existing code ported over. Among other improvments, 
+    this version now supports AES-CCM (e.g. with esp=aes128ccm12) and AES-GCM
+    (e.g. with esp=aes256gcm16) starting with kernel 2.6.25 and enables dead
+    peer detection by default.
+    Note that charon (IKEv2) now uses the new /etc/strongswan.conf.
+  * Enabled building of VIA Padlock and openssl crypto plugins.
+  * Drop patch to rename AES_cbc_encrypt so as not to conflict with an
+    openssl method of the same name. This has been applied upstream.
+  * This new upstream version no longer uses dbus.
+    Closes: #475098: charon needs dbus but strongswan does not depend on dbus
+    Closes: #475099: charon does not work any more
+  * This new upstream version no longer prints error messages in its
+    init script.
+    Closes: #465718: strongswan: startup on booting returns error messages 
+  * Apply patch to ipsec init script to fix bashism.
+    Closes: #473703: strongswan: bashism in /bin/sh script 
+  * Updated Czech debconf translation.
+    Closes: #480928: [l10n] Updated Czech translation of strongswan debconf
+                     messages
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Thu, 10 Jul 2008 14:40:43 +0200
+
+strongswan (4.1.11-1) unstable; urgency=low
+
+  * New upstream release.
+  * DBUS support now interacts with network-manager, so need to build-depend
+    on network-manager-dev.
+  * The web interface has been improved and now requires libfcgi-dev and
+    clearsilver-dev to compile, so build-depend on them. Also build-depend
+    on libxml2-dev, libdbus-1-dev, libtool, and libsqlite3-dev (which were 
+    all build-deps before but were not listed explicitly so far - fix that).
+  * Add patch to rename internal AES_cbc_encrypt function and thus avoid
+    conflict with the openssl function.
+    Closes: #470721: pluto segfaults when using pkcs11 library linked with 
+                     OpenSSL
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Sun, 30 Mar 2008 10:35:16 +0200
+
+strongswan (4.1.10-2) unstable; urgency=low
+
+  * Enable new configure options: dbus, xml, nonblocking, thread, peer-
+    to-peer NAT-traversal and the manager interface support.
+  * Also set the default path to the opensc-pkcs11 engine explicitly.
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Fri, 15 Feb 2008 10:25:49 +0100
+
+strongswan (4.1.10-1) unstable; urgency=low
+
+  * New upstream release.
+    Closes: #455711: New upstream version 4.1.9
+  * Updated Japanese debconf translation.
+    Closes: #463321: strongswan: [INTL:ja] Update po-debconf template 
+                     translation (ja.po)
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Thu, 07 Feb 2008 15:15:14 +0100
+
+strongswan (4.1.8-3) unstable; urgency=low
+
+  * Force use of hardening-wrapper when building the package by setting
+    a Build-Dep to it and setting export DEB_BUILD_HARDENING=1 in
+    debian/rules.
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Thu, 07 Feb 2008 14:14:48 +0100
+
+strongswan (4.1.8-2) unstable; urgency=medium
+
+  * Ship our own init script, since upstream no longer does. This is still
+    installed as /etc/init.d/ipsec (and not /etc/init.d/strongswan) to be 
+    backwards compatible.
+    Really closes: #442880: strongswan: postinst failure (missing 
+                            /etc/init.d/ipsec)
+  * Actually, need to be smarter with ipsec.conf and ipsec.secrets. Not
+    marking them as conffiles isn't the right thing either. Instead, now
+    use the includes feature to pull in config snippets that are
+    modified by debconf. It's not perfect, though, as the IKEv1/IKEv2
+    protocols can't be enabled/disabled with includes. Therefore don't
+    support this option in debconf for the time being, but default to
+    enabled for both IKE versions. The files edited with debconf are kept
+    under /var/lib/strongswan.
+  * Cleanup debian/rules: no longer need to remove leftover files from 
+    patching, as currently there are no Debian-specific patches (fortunately).
+  * More cleanup: drop debconf translations hack for woody compatibility,
+    depend on build-stamp instead of build in the install-strongswan target,
+    and remove the now unnecessary dh_clean -k call in install-strongswan so
+    that configure shouldn't run twice during building the package.
+  * Update French debconf translation.
+    Closes: #448327: strongswan: [INTL:fr] French debconf templates 
+                     translation update
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Fri, 02 Nov 2007 21:55:29 +0100
+
+strongswan (4.1.8-1) unstable; urgency=low
+
+  The "I'm back from my long semi-vacation, and strongswan is now bug-free 
+  again" release.
+  * New upstream release.
+    Closes: #442880: strongswan: postinst failure (missing /etc/init.d/ipsec)
+    Closes: #431874: strongswan - FTBFS: cannot create regular file 
+                     `/etc/ipsec.conf': Permission denied
+  * Explicitly use debhalper compatbility version 5m now using debian/compat
+    instead of DH_COMPAT.
+  * Since there's no configurability in dh_installdeb's mania to flag 
+    everything below /etc as a conffile, now hack DEBIAN/conffiles directly
+    to remove ipsec.conf and ipsec.secrets.
+    Closes: #442929: strongswan: Maintainer script modifies conffiles
+  * Add/update debconf translations.
+    Closes: #432189: strongswan: [INTL:de] updated German debconf translation
+    Closes: #432212: [l10n] Updated Czech translation of strongswan debconf 
+                     messages
+    Closes: #432642: strongswan: [INTL:fr] French debconf templates 
+                     translation update
+    Closes: #444710: strongswan: [INTL:pt] Updated Portuguese translation for 
+                     debconf messages
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Fri, 26 Oct 2007 16:16:51 +0200
+
+strongswan (4.1.4-1) unstable; urgency=low
+
+  * New upstream release.
+  * Fixed debconf descriptions.
+    Closes: #431157: strongswan: Minor errors in Debconf template
+  * Include Portugese and 
+    Closes: #415178: strongswan: [INTL:pt] Portuguese translation for debconf
+                     messages
+    Closes: #431154: strongswan: [INTL:de] initial German debconf translation
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Thu, 05 Jul 2007 00:53:01 +0100
+
+strongswan (4.1.3-1) unreleased; urgency=low
+
+  * New upstream release.
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Sun, 03 Jun 2007 18:39:11 +0100
+
+strongswan (4.1.1-1) unreleased; urgency=low
+
+  Major new upstream release:
+  * IKEv2 support with the new "charon" daemon in addition to the old "pluto"
+    which is still used for IKEv1.
+  * Switches to auto* tools build system.
+  * The postinst script is still not quite as complete in updating the 2.8.x
+    config automatically to a new 4.x config, but I don't want to wait any
+    longer with the upload. It can be improved later on.
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Thu, 12 Apr 2007 21:33:56 +0100
+
+strongswan (2.8.3-1) unstable; urgency=low
+
+  * New upstream release with fixes for the SHA-512-HMAC function and
+    added SHA-384 and SHA-2 implementations.
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Thu, 22 Feb 2007 20:19:45 +0000
+
+strongswan (2.8.2-1) unstable; urgency=low
+
+  * New upstream release with interoperability fixes for some VPN
+    clients.
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Tue, 30 Jan 2007 12:21:20 +0000
+
+strongswan (2.8.1+dfsg-1) unstable; urgency=low
+
+  * New upstream release, now with XAUTH support.
+  * Explicitly enable smartcard and vendorid options as well as a 
+    few more in debian/rules.
+    Closes: #407449: strongswan: smartcard support is disabled
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Sun, 28 Jan 2007 21:06:25 +0000
+
+strongswan (2.8.1-1) UNRELEASED; urgency=low
+
+  * New upstream release.
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Sun, 28 Jan 2007 20:59:11 +0000
+
+strongswan (2.8.0+dfsg-1) unstable; urgency=low
+
+  * New upstream release.
+  * Update debconf templates.
+    Closes: #388672: strongswan: [INTL:fr] French debconf templates
+                     translation update
+    Closes: #389253: [l10n] Updated Czech translation of strongswan
+                     debconf messages
+    Closes: #391457: [INTL:nl] Updated dutch po-debconf translation 
+    Closes: #396179: strongswan: [INTL:ja] Updated Japanese po-debconf
+                     template translation (ja.po)
+  * Fix broken reference to a now non-existing config file. no_oe.conf
+    has been replaced by oe.conf, with the opposite meaning. Changed
+    postinst to deal with it correctly now, and also try to convert
+    older config file lines to newer (e.g. when updating from openswan
+    to strongswan).
+    Closes: #391565: fails to start : /etc/ipsec.conf:46: include
+                     files found no matches 
+		     [/etc/ipsec.d/examples/no_oe.conf]
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Mon,  6 Nov 2006 19:01:58 +0000
+
+strongswan (2.7.3+dfsg-1) unstable; urgency=low
+
+  * New upstream release. Another try on getting it into unstable.
+    Closes: #372267: ITP: strongswan -- second fork of freeswan.
+  * Call debian-updatepo in the clean target, in line with the openswan
+    change for its version 2.4.6+dfsg-1.
+  * Remove man2html, htmldoc, and lynx from the Build-Deps because we no
+    longer rebuild the documentation tree.
+  * Starting shipping a lintian overrides file to finally silence the 
+    warnings about non-standard-(file|dir)-perms (they are intentional).
+  * Clean up /usr/lib/ipsec somehow, again owing to lintian warnings.
+  * Add po-debconf to build dependencies.
+    
+ -- Rene Mayrhofer <rmayr@debian.org>  Wed, 23 Aug 2006 21:23:36 +0100
+
+strongswan (2.7.2+dfsg-1) unstable; urgency=low
+
+  * First upload to the main Debian archive. This does no longer build
+    the linux-patch-strongswan and strongswan-modules-source packages,
+    as KLIPS will be removed from the strongswan upstream source anyway
+    for the next major release. However, the openswan KLIPS could should
+    be interoperable with strongswan user space.
+    Closes: #372267: ITP: strongswan -- second fork of freeswan.
+  * This upload removes the draft RFCs, as they are not considered free under
+    the DFSG.
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Sun,  9 Jul 2006 12:40:34 +0100
+
+strongswan (2.7.2-1) unstable; urgency=low
+
+  * New upstream release. This release fixes a potential DoS problem.
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Mon, 26 Jun 2006 12:34:43 +0100
+ 
+strongswan (2.7.0-1) unstable; urgency=low
+
+  * Initial Debian packaging of strongswan. This is directly based on my
+    Debian package of openswan 2.4.5-3.
+  * Do not compile and ship fswcert right now, because it is not included
+    in strongswan upstream. If it turns out to be necessary for supporting
+    easy-to-use OE in the future (i.e. for generating the DNS format for the
+    public keys from generated X.509 certificates), I will re-add it to the
+    Debian package.
+  * Also disabled my patches to use /etc/default instead of /etc/sysconfig for
+    now. Something like that will be necessary in the future, but those parts
+    of strongswan differ significanty from openswan.
+
+ -- Rene Mayrhofer <rmayr@debian.org>  Mon, 22 May 2006 07:37:00 +0100
