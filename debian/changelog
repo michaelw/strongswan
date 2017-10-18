@@ -1,3 +1,10 @@
+strongswan (5.3.5-1ubuntu3.4instart1) precise; urgency=low
+
+  * backport to precise
+  * removed systemd, fixed build-deps
+
+ -- Michael Weber <mweber@instartlogic.com>  Tue, 17 Oct 2017 23:25:32 -0700
+
 strongswan (5.3.5-1ubuntu3.4) xenial-security; urgency=medium
 
   * SECURITY UPDATE: Fix RSA signature verification

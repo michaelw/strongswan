@@ -167,8 +167,8 @@ ifeq ($(DEB_BUILD_ARCH_OS),linux)
 	dh_install -p libstrongswan-extra-plugins usr/share/strongswan/templates/config/plugins/af-alg.conf
 	dh_install -p libstrongswan-extra-plugins etc/strongswan.d/charon/af-alg.conf
 	# the systemd service file only gets generated on Linux
-	dh_systemd_enable --name=strongswan
-	dh_systemd_start --name=strongswan
+	# dh_systemd_enable --name=strongswan
+	# dh_systemd_start --name=strongswan
 endif
 
 ifeq ($(DEB_BUILD_ARCH_OS),kfreebsd)
@@ -259,4 +259,4 @@ ifeq ($(DEB_BUILD_ARCH),amd64)
 endif
 
 %:
-	dh $@ --parallel --with autoreconf,systemd
+	dh $@ --parallel --with autoreconf
